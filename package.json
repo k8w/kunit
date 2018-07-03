@@ -1,10 +1,10 @@
 {
   "name": "kunit",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc -d && cp package.json package-lock.json LICENSE dist && cp src/*.d.ts dist/src/"
+    "build": "rm -rf dist && tsc -d && cp package.json package-lock.json LICENSE README.md dist && cp src/*.d.ts dist/src/"
   },
   "repository": {
     "type": "git",
