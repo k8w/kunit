@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc -d && cp package.json package-lock.json LICENSE dist && cp src/*.d.ts dist/src/"
   },
   "repository": {
     "type": "git",
