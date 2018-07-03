@@ -1,0 +1,22 @@
+{
+  "name": "kunit",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/k8w/kunit.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/k8w/kunit/issues"
+  },
+  "homepage": "https://github.com/k8w/kunit#readme",
+  "dependencies": {
+    "k8w-extend-native": "^0.2.0"
+  }
+}
