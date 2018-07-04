@@ -1,8 +1,6 @@
-declare let process: any;
-
 export default function ColorLog(content: string, color: 'green' | 'red' | 'yellow') {
     // nodejs
-    if (typeof process !== 'undefined') {
+    if (typeof window === 'undefined') {
         const colorMap = {
             yellow: '\x1b[33m',
             green: '\x1b[32m',
