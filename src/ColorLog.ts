@@ -11,6 +11,7 @@ export default function ColorLog(content: string, color: 'green' | 'red' | 'yell
     }
     // browser or weapp
     else {
-        console.log(`%c${content}`, `color: ${color}; background: black;`);
+        let bg = color == 'yellow' ? 'background: black;' : '';
+        console.log(`%c${content}`, `color: ${color};${bg}`);
     }
 }
