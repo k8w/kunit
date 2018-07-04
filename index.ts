@@ -3,6 +3,12 @@ import TestCaseResult from './src/TestCaseResult';
 import TestCase from './src/TestCase';
 import ColorLog from './src/ColorLog';
 
+interface RunningTestCase {
+    testCase: TestCase,
+    childCases: TestCase[],
+    result: TestCaseResult;
+}
+
 export default class KUnit {
 
     private static _instance: KUnit;
@@ -15,17 +21,16 @@ export default class KUnit {
 
     private _testCases: TestCase[] = [];
 
-    async test(caseName: string, func: Function): Promise<TestCase> {
+    test(caseName: string, func: Function): TestCase {
         let testCase: TestCase = {
             name: caseName,
             func: func
         };
-
         // running
-        if (this._runningCasesStack.length) {
+        let lastCase = this._runningCasesStack.last();
+        if (lastCase) {
             // add child
-            let childResult = await this.run(testCase);
-            this._runningCasesStack.last()!.addChild(childResult);
+            lastCase.childCases.push(testCase);
         }
         // not running
         else {
@@ -37,42 +42,75 @@ export default class KUnit {
     };
 
 
-    private _runningCasesStack: TestCaseResult[] = [];
-    private async run(testCase: TestCase): Promise<TestCaseResult> {
-        let result = new TestCaseResult(testCase.name);
-        this._runningCasesStack.push(result);
+    private _runningCasesStack: RunningTestCase[] = [];
+    async run(testCase: TestCase): Promise<TestCaseResult> {
+        
+        // 生成RunningCase
+        let runningCase: RunningTestCase = {
+            testCase: testCase,
+            childCases: [],
+            result: new TestCaseResult(testCase.name)
+        };
+
+        // 执行主任务
+        this._runningCasesStack.push(runningCase);
         try {
             await testCase.func();
-            result.isSucc = true;
         }
         catch (e) {
-            result.isSucc = false;
-            result.err = e;
+            // 同步过程出错 直接返回
+            runningCase.result.isSucc = false;
+            runningCase.result.err = e;
+            return runningCase.result;
         }
-        this._runningCasesStack.pop();
-        return result;
+        finally {
+            this._runningCasesStack.pop();
+        }
+
+        // 主任务成功
+        // 执行子任务
+        if (runningCase.childCases.length) {
+            for (let childCase of runningCase.childCases) {
+                runningCase.result.addChild(await this.run(childCase));
+            } 
+            if (!runningCase.result.children || runningCase.result.children.some(v => !v.isSucc)) {
+                runningCase.result.isSucc = false;
+                return runningCase.result;
+            }
+        }
+               
+        runningCase.result.isSucc = true;
+        return runningCase.result;
     }
 
     clear() {
         this._testCases = [];
     };
 
-    async runAll() {
+    async runAll() {        
         ColorLog('------------- KUNIT TEST START  -------------', 'yellow')
         let result = new TestCaseResult('');
         for (let testCase of this._testCases) {
-            result.addChild(await this.run(testCase));
+            let caseResult = await this.run(testCase);
+            result.addChild(caseResult);
         }
 
-        ColorLog('------------- KUNIT TEST DONE  -------------', 'yellow')
-        if (result.children) {
-            for (let child of result.children) {
-                child.show();
+        if (result.children && result.children.some(v => !v.isSucc)) {
+            ColorLog('------------- KUNIT TEST ERROR  -------------', 'yellow')
+
+            for (let child of result.children!) {
+                !child.isSucc && child.showError();
             }
-            ColorLog(`------------- KUNIT TEST RESULT  -------------`, 'yellow')
+        }
+
+        if (result.children) {
+            ColorLog('------------- KUNIT TEST RESULT  -------------', 'yellow')
+            for (let child of result.children!) {
+                child.showResult();
+            }
 
             let succNum = result.children.count(v => v.isSucc ? true : false);
-            ColorLog(`${succNum} of ${result.children.length} succeeded.`, succNum === result.children.length ? 'green' : 'red')
+            ColorLog(`\n[RESULT] ${succNum} of ${result.children.length} succeeded.`, succNum === result.children.length ? 'green' : 'red')
         }
         else {
             console.warn('没有可用的测试用例')

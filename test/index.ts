@@ -12,11 +12,11 @@ test('Test A', async function () {
     console.log('aaa')
     assert.equal(1, 1);
 
-    await test('A1', async function () {
+    test('A1', async function () {
         console.log('aaa1')
     })
 
-    await test('A2', async function () {
+    test('A2', async function () {
         console.log('aaa2')
     })
 })
