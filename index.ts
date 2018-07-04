@@ -115,6 +115,8 @@ export default class KUnit {
         else {
             console.warn('没有可用的测试用例')
         }
+
+        return result;
     };
 }
 
