@@ -7,8 +7,40 @@ KUnit
 
 ```ts
 import { test } from '../index';
-import KUnit from '../index';
 import { assert } from 'chai';
+import KUnit from '../index';
+
+test('测试用例1', function () {
+    assert.equal(1, 1);
+})
+
+let case2 = test('异步测试用例 2', function () {
+    test('2-1', async function () {
+        await (3000);
+        assert.equal(1, 1);
+        console.log('FINISH 2-1')
+    })
+
+    test('2-2', async function () {
+        await (500);
+        assert.equal(1, 2);
+        console.log('FINISH 2-2')
+    })
+})
+
+test('测试用例3', function () {
+    assert.equal(1, 2, '1等于2应该异常');
+})
+
+test('同步测试用例 4', function () {
+    test('2-1', function () {
+        assert.equal(1, 1);
+    })
+
+    test('2-2', function () {
+        assert.equal(1, 2);
+    })
+})
 
 async function wait(ms: number) {
     return new Promise(rs => {
@@ -16,23 +48,5 @@ async function wait(ms: number) {
     })
 }
 
-test('Test A', async function () {
-    console.log('aaa')
-    assert.equal(1, 1);
-
-    await test('A1', async function () {
-        console.log('aaa1')
-    })
-
-    await test('A2', async function () {
-        console.log('aaa2')
-    })
-})
-
-test('Test B', function () {
-    console.log('bbb')
-    assert.equal(1, 2);
-})
-
-KUnit.instance.runAll()
+KUnit.instance.runAll();
 ```

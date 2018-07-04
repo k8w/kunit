@@ -11,6 +11,6 @@ export default function ColorLog(content: string, color: 'green' | 'red' | 'yell
     }
     // browser or weapp
     else {
-        console.log(`%c${content}`, `color: ${color}`);
+        console.log(`%c${content}`, `color: ${color}; background: black;`);
     }
 }

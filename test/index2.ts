@@ -40,8 +40,4 @@ async function wait(ms: number) {
     })
 }
 
-async function main() {
-    await KUnit.instance.runAll();
-    console.log('应该出错的：2-2-2 3 4-2-2')
-}
-main();
+KUnit.instance.runAll();
