@@ -40,4 +40,55 @@ async function wait(ms: number) {
     })
 }
 
-KUnit.instance.runAll();
+test('await Promise succ', async function () {
+    await new Promise((rs, rj) => {
+        setTimeout(() => { rs() }, 50)
+    })
+})
+
+test('await Promise fail', async function () {
+    await new Promise((rs, rj) => {
+        setTimeout(() => { rj() }, 50)
+    })
+})
+
+test('await Promise uncaught', async function () {
+    await new Promise((rs, rj) => {
+        wait(50).then(() => {
+            assert.ok(false, 'uncaught err');
+        }).catch(e => {
+            rj(e)
+        });
+    })
+})
+
+test('await Promise uncaught 2', async function () {
+    await new Promise((rs, rj) => {
+        setTimeout(() => {
+            try {
+                assert.ok(false, 'uncaught err');
+            }
+            catch (e) {
+                rj(e)
+            }
+        }, 50)
+    });
+})
+
+
+test('await Promise uncaught 2', async function () {
+    await new Promise(async (rs, rj) => {
+        await wait(50);
+        try {
+            assert.ok(false, 'uncaught err');
+        }
+        catch (e) {
+            rj(e)
+        }
+    });
+})
+
+
+KUnit.instance.runAll().then(() => {
+    console.log('应该成功 1，2-2-1，4-2-1，其余失败')
+});
