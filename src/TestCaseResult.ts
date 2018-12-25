@@ -81,8 +81,8 @@ export default class TestCaseResult {
         if (!this.isSucc) {
             if (this.err && (this.err as any).showDiff) {
                 ColorLog(`${indent}× ${this.name}
-  |- Expected: ${(this.err as any).expected}
-  |- Actual: ${(this.err as any).actual}
+  |- Expected: ${JSON.stringify((this.err as any).expected, null, 2)}
+  |- Actual: ${JSON.stringify((this.err as any).actual, null, 2)}
   |- ${this.err.stack}`, 'red');
             }
             else if (this.err) {
