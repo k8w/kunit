@@ -16,9 +16,7 @@ export interface KUnitOptions {
 
 export default class KUnit {
 
-    options: KUnitOptions = {
-
-    }
+    options: KUnitOptions = {}
 
     logger: Logger = console;
 
@@ -107,6 +105,7 @@ export default class KUnit {
         for (let testCase of this._testCases) {
             let caseResult = await this.run(testCase);
             result.addChild(caseResult);
+            this.logger.debug(`${result.children!.length}/${this._testCases.length} ${caseResult.name} ${caseResult.isSucc ? '√ Succ' : '× Failed'}`)
         }
 
         if (result.children && result.children.some(v => !v.isSucc)) {
