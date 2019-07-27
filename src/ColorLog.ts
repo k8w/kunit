@@ -1,4 +1,18 @@
-export default function ColorLog(content: string, color: 'green' | 'red' | 'yellow') {
+import KUnit from '../index';
+export default function ColorLog(kunit: KUnit, content: string, color: 'green' | 'red' | 'yellow') {
+    if (kunit.logger !== console || kunit.options.disableColorLog) {
+        if (color === 'red') {
+            kunit.logger.error(content);
+        }
+        else if (color === 'yellow') {
+            kunit.logger.warn(content);
+        }
+        else {
+            kunit.logger.log(content);
+        }
+        return;
+    }
+
     // nodejs
     if (typeof window === 'undefined') {
         const colorMap = {
@@ -7,11 +21,11 @@ export default function ColorLog(content: string, color: 'green' | 'red' | 'yell
             red: '\x1b[31m',
             white: '\x1b[37m'
         };
-        console.log(colorMap[color] + content + colorMap['white']);
+        kunit.logger.log(colorMap[color] + content + colorMap['white']);
     }
     // browser or weapp
     else {
         let bg = color == 'yellow' ? 'background: black;' : '';
-        console.log(`%c${content}`, `color: ${color};${bg}`);
+        kunit.logger.log(`%c${content}`, `color: ${color};${bg}`);
     }
 }

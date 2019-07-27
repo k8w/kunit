@@ -2,6 +2,7 @@ import 'k8w-extend-native';
 import TestCaseResult from './src/TestCaseResult';
 import TestCase from './src/TestCase';
 import ColorLog from './src/ColorLog';
+import { Logger } from './src/Logger';
 
 interface RunningTestCase {
     testCase: TestCase,
@@ -9,7 +10,17 @@ interface RunningTestCase {
     result: TestCaseResult;
 }
 
+export interface KUnitOptions {
+    disableColorLog?: boolean;
+}
+
 export default class KUnit {
+
+    options: KUnitOptions = {
+
+    }
+
+    logger: Logger = console;
 
     private static _instance: KUnit;
     static get instance(): KUnit {
@@ -20,6 +31,9 @@ export default class KUnit {
     }
 
     private _testCases: TestCase[] = [];
+    get testCases() {
+        return this._testCases;
+    }
 
     test(caseName: string, func: Function): TestCase {
         let testCase: TestCase = {
@@ -44,12 +58,12 @@ export default class KUnit {
 
     private _runningCasesStack: RunningTestCase[] = [];
     async run(testCase: TestCase): Promise<TestCaseResult> {
-        
+
         // 生成RunningCase
         let runningCase: RunningTestCase = {
             testCase: testCase,
             childCases: [],
-            result: new TestCaseResult(testCase.name)
+            result: new TestCaseResult(testCase.name, this)
         };
 
         // 执行主任务
@@ -72,13 +86,13 @@ export default class KUnit {
         if (runningCase.childCases.length) {
             for (let childCase of runningCase.childCases) {
                 runningCase.result.addChild(await this.run(childCase));
-            } 
+            }
             if (!runningCase.result.children || runningCase.result.children.some(v => !v.isSucc)) {
                 runningCase.result.isSucc = false;
                 return runningCase.result;
             }
         }
-               
+
         runningCase.result.isSucc = true;
         return runningCase.result;
     }
@@ -87,16 +101,16 @@ export default class KUnit {
         this._testCases = [];
     };
 
-    async runAll() {        
-        ColorLog('------------- KUNIT TEST START  -------------', 'yellow')
-        let result = new TestCaseResult('');
+    async runAll() {
+        ColorLog(this, '------------- KUNIT TEST START  -------------', 'yellow')
+        let result = new TestCaseResult('', this);
         for (let testCase of this._testCases) {
             let caseResult = await this.run(testCase);
             result.addChild(caseResult);
         }
 
         if (result.children && result.children.some(v => !v.isSucc)) {
-            ColorLog('------------- KUNIT TEST ERROR  -------------', 'yellow')
+            ColorLog(this, '------------- KUNIT TEST ERROR  -------------', 'yellow')
 
             for (let child of result.children!) {
                 !child.isSucc && child.showError();
@@ -104,13 +118,13 @@ export default class KUnit {
         }
 
         if (result.children) {
-            ColorLog('------------- KUNIT TEST RESULT  -------------', 'yellow')
+            ColorLog(this, '------------- KUNIT TEST RESULT  -------------', 'yellow')
             for (let child of result.children!) {
                 child.showResult();
             }
 
             let succNum = result.children.count(v => v.isSucc ? true : false);
-            ColorLog(`\n[RESULT] ${succNum} of ${result.children.length} succeeded.`, succNum === result.children.length ? 'green' : 'red')
+            ColorLog(this, `\n[RESULT] ${succNum} of ${result.children.length} succeeded.`, succNum === result.children.length ? 'green' : 'red')
         }
         else {
             console.warn('没有可用的测试用例')
