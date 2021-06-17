@@ -1,4 +1,4 @@
-export default interface TestCase {
+export interface TestCase {
     name: string;
     func: Function;
 }

@@ -1,8 +1,8 @@
 import 'k8w-extend-native';
-import TestCaseResult from './src/TestCaseResult';
-import TestCase from './src/TestCase';
-import ColorLog from './src/ColorLog';
-import { Logger } from './src/Logger';
+import ColorLog from './ColorLog';
+import { Logger } from './Logger';
+import { TestCase } from './TestCase';
+import TestCaseResult from './TestCaseResult';
 
 interface RunningTestCase {
     testCase: TestCase,
@@ -14,7 +14,7 @@ export interface KUnitOptions {
     disableColorLog?: boolean;
 }
 
-export default class KUnit {
+export class KUnit {
 
     options: KUnitOptions = {}
 

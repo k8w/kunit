@@ -1,5 +1,5 @@
 import ColorLog from './ColorLog';
-import KUnit from '../index';
+import { KUnit } from './index';
 
 export default class TestCaseResult {
     static currentIndentNum = 0;

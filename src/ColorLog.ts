@@ -1,4 +1,4 @@
-import KUnit from '../index';
+import { KUnit } from './index';
 export default function ColorLog(kunit: KUnit, content: string, color: 'green' | 'red' | 'yellow') {
     if (kunit.logger !== console || kunit.options.disableColorLog) {
         if (color === 'red') {

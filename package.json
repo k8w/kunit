@@ -1,10 +1,17 @@
 {
   "name": "kunit",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.cjs",
+  "exports": {
+    "require": "./index.cjs",
+    "import": "./index.mjs"
+  },
   "scripts": {
-    "build": "rm -rf dist && tsc -d && cp package.json package-lock.json LICENSE README.md dist && cp src/*.d.ts dist/src/"
+    "test": "npx mocha",
+    "build": "npm run build:js && npm run build:dts && cp package.json LICENSE README.md dist/",
+    "build:js": "rm -rf dist && npx rollup -c",
+    "build:dts": "rm -rf lib && npx tsc && npx api-extractor run --local --verbose && rm -rf lib"
   },
   "repository": {
     "type": "git",
@@ -18,5 +25,11 @@
   "homepage": "https://github.com/k8w/kunit#readme",
   "dependencies": {
     "k8w-extend-native": "*"
+  },
+  "devDependencies": {
+    "@microsoft/api-extractor": "^7.16.1",
+    "rollup": "^2.52.0",
+    "rollup-plugin-typescript2": "^0.30.0",
+    "typescript": "^4.3.2"
   }
 }
